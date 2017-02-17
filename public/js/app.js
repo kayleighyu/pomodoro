@@ -1,7 +1,7 @@
 //Data and variable declarations
 var timer;
-var minutesLeft = 25;
-var secondsLeft = 10;
+var minutesLeft = 0;
+var secondsLeft = 5;
 var isOnBreak = false;
 var numberOfBreaks = 0;
 //Getting references to the DOM
@@ -19,6 +19,19 @@ function start(){
   }
 }
 function tick(){
+  if(secondsLeft === 0 && minutesLeft === 0){
+    clearInterval(timer);
+    timer = !timer;
+    if (isOnBreak){
+      numberOfBreaks +=1;
+      resetWorkTime();
+    } else {
+      resetBreakTime();
+    }
+    isOnBreak = !isOnBreak;
+    render();
+    return; //tells the function to stop
+  }
   decrementMinutes();
   decrementSeconds();
   render();
@@ -45,4 +58,17 @@ function pad(num){
 function render(){
   minutes.textContent = pad(minutesLeft);
   seconds.textContent = pad(secondsLeft);
+}
+function resetWorkTime(){
+  minutesLeft = 00;
+  secondsLeft = 05;
+}
+function resetBreakTime(){
+  if(numberOfBreaks < 3){
+    minutesLeft = 5;
+  } else {
+    minutesLeft = 15;
+    numberOfBreaks = 0;
+  }
+  secondsLeft = 0;
 }
