@@ -1,8 +1,8 @@
 //function createTimer(mainElement){}
 var Timer = {
   //el:mainElement;
-  minutesLeft: 0,
-  secondsLeft: 5,
+  minutesLeft: 25,
+  secondsLeft: 0,
   isOnBreak: false,
   numberOfBreaks: 0,
   init: function(){
@@ -15,6 +15,8 @@ var Timer = {
     this.minutes = document.querySelector('#minutes');//this.root.document..., then change to classes
     this.seconds = document.querySelector('#seconds');
     this.startButton = document.querySelector('#start');
+    this.stopButton = document.querySelector('#stop');
+    this.resetButton = document.querySelector('#reset');
   },
   render: function(){
     this.minutes.textContent = this.pad(this.minutesLeft);
@@ -24,6 +26,21 @@ var Timer = {
     //the bind takes the meaning of 'this' from addListeners and
     //pushes that meaning into the start function
     this.startButton.addEventListener('click', this.start.bind(this));
+    this.stopButton.addEventListener('click', this.stop.bind(this));
+    this.resetButton.addEventListener('click', this.reset.bind(this));
+  },
+  reset: function(){
+    clearInterval(this.timer);
+    this.timer = false;
+    this.isOnBreak = false;
+    this.numberOfBreaks = 0;
+    this.minutesLeft = 25;
+    this.secondsLeft = 0;
+    this.render();
+  },
+  stop: function(){
+    clearInterval(this.timer);
+    this.timer = !this.timer; //this doesn't work right
   },
   start: function(){
     if(!this.timer){
@@ -31,14 +48,15 @@ var Timer = {
     }
   },
   tick: function(){
-    console.log(this);
     if(this.secondsLeft === 0 && this.minutesLeft === 0){
       clearInterval(this.timer);
       this.timer = !this.timer;
       if (this.isOnBreak){
+        //alert('Time for work!');
         this.numberOfBreaks +=1;
         this.resetWorkTime();
       } else {
+        //alert('Time for a break!');
         this.resetBreakTime();
       }
       this.isOnBreak = !this.isOnBreak;
@@ -69,20 +87,57 @@ var Timer = {
     }
   },
   resetWorkTime: function(){
-    this.minutesLeft = 00;
-    this.secondsLeft = 05;
+    this.minutesLeft = 25;
+    this.secondsLeft = 00;
   },
   resetBreakTime: function(){
+    console.log(this.numberOfBreaks);
     if(this.numberOfBreaks < 3){
       this.minutesLeft = 5;
+      this.secondsLeft = 0;
     } else {
       this.minutesLeft = 15;
       this.numberOfBreaks = 0;
     }
-    this.secondsLeft = 0;
+    // this.secondsLeft = 0;
   },
 }
 Timer.init();
+
+// progressbar.js@1.0.0 version is used
+// Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
+
+var bar = new ProgressBar.Circle(container, {
+  color: '#aaa',
+  // This has to be the same size as the maximum width to
+  // prevent clipping
+  strokeWidth: 4,
+  trailWidth: 1,
+  easing: 'easeInOut',
+  duration: 1400,
+  text: {
+    autoStyleContainer: false
+  },
+  from: { color: '#aaa', width: 1 },
+  to: { color: '#333', width: 4 },
+  // Set default step function for all animate calls
+  step: function(state, circle) {
+    circle.path.setAttribute('stroke', state.color);
+    circle.path.setAttribute('stroke-width', state.width);
+
+    var value = Math.round(circle.value() * 100);
+    if (value === 0) {
+      circle.setText('');
+    } else {
+      circle.setText(value);
+    }
+
+  }
+});
+bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+bar.text.style.fontSize = '2rem';
+
+bar.animate(1.0);  // Number from 0.0 to 1.0
 //var one = createTimer(''#one');
 //one.init();
 
